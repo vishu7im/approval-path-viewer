@@ -92,47 +92,60 @@ const approval_hierarchy = {
     {
       role: "ceo",
       user_name: "ramesh ceo",
-      condtion: ["ammount>10000"],
       next_status: "finance_approval",
-      previous: "draft",
+      previous_status: "draft",
       current_status: "project_approval",
-      level: "1"
+      level: 1,
+      approved_by_uuid: null,
+      approved_by_name: "",
+      current_pointer: false
     },
     {
       role: "project_manager",
       user_name: "rohit",
-      condtion: ["ammount>1000"],
       next_status: "finance_approval",
-      previous: "draft",
+      previous_status: "draft",
       current_status: "project_approval",
-      level: "2"
+      level: 2,
+      approved_by_uuid: null,
+      approved_by_name: "",
+      current_pointer: true
     },
     {
       role: "category_manager",
       user_name: "manish",
       next_status: "finance_approval",
-      previous: "draft",
+      previous_status: "draft",
       current_status: "project_approval",
-      level: "2"
-    },
+      level: 2,
+      approved_by_uuid: null,
+      approved_by_name: "",
+      current_pointer: false
+    }
   ],
   "finance_approval": [
     {
       role: "finance_manager",
       user_name: "rahul",
       next_status: "cleared",
-      previous: "draft",
+      previous_status: "project_approval",
       current_status: "finance_approval",
-      level: "1"
+      level: 1,
+      approved_by_uuid: null,
+      approved_by_name: "",
+      current_pointer: false
     },
     {
       role: "finance_manager",
       user_name: "rahul",
       next_status: "cleared",
-      previous: "draft",
+      previous_status: "project_approval",
       current_status: "finance_approval",
-      level: "2"
-    },
+      level: 2,
+      approved_by_uuid: null,
+      approved_by_name: "",
+      current_pointer: false
+    }
   ],
   "cleared": []
 };
