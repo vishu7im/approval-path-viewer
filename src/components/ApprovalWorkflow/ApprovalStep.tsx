@@ -1,17 +1,21 @@
 
 import React from "react";
-import { Check, Clock, User } from "lucide-react";
+import { Check, Clock, User, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ApprovalStatus = "pending" | "approved" | "skipped" | "current";
 
+interface ApproverInfo {
+  name: string;
+  role: string;
+  approved: boolean;
+  isCurrentPointer: boolean;
+  approvedBy?: string;
+}
+
 interface ApprovalStepProps {
   title: string;
-  approvers: {
-    name: string;
-    role: string;
-    approved?: boolean;
-  }[];
+  approvers: ApproverInfo[];
   status: ApprovalStatus;
   isLastStep?: boolean;
 }
@@ -64,13 +68,27 @@ export function ApprovalStep({
                 {approvers.map((approver, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-2 text-sm text-gray-600"
+                    className={cn(
+                      "flex items-center gap-2 text-sm p-2 rounded-md",
+                      approver.isCurrentPointer && "bg-blue-50 dark:bg-blue-900/20"
+                    )}
                   >
-                    <User className="h-3.5 w-3.5" />
+                    {approver.approved ? (
+                      <UserCheck className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <User className="h-4 w-4" />
+                    )}
                     <span>{approver.name}</span>
                     <span className="text-xs italic">({approver.role})</span>
-                    {approver.approved && (
-                      <Check className="h-3.5 w-3.5 text-green-500" />
+                    {approver.approved && approver.approvedBy && (
+                      <span className="text-xs text-green-600">
+                        Approved by: {approver.approvedBy}
+                      </span>
+                    )}
+                    {approver.isCurrentPointer && (
+                      <span className="text-xs text-blue-600 ml-auto">
+                        Current Approver
+                      </span>
                     )}
                   </div>
                 ))}
