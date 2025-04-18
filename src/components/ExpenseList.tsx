@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Table,
@@ -15,6 +14,7 @@ import { ExpenseDetails } from "./ExpenseDetails";
 import { ApprovalPathViewer } from "./ApprovalWorkflow/ApprovalPathViewer";
 import { Badge } from "./ui/badge";
 import { Input } from "./ui/input";
+import { Card, CardHeader, CardTitle } from "./ui/card";
 
 interface Expense {
   id: string;
@@ -156,68 +156,80 @@ export function ExpenseList() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "draft":
-        return "bg-gray-500";
+        return "bg-slate-500 hover:bg-slate-600";
       case "project_approval":
-        return "bg-amber-500";
+        return "bg-amber-500 hover:bg-amber-600";
       case "finance_approval":
-        return "bg-blue-500";
+        return "bg-blue-500 hover:bg-blue-600";
       case "cleared":
-        return "bg-green-500";
+        return "bg-emerald-500 hover:bg-emerald-600";
       default:
-        return "bg-gray-500";
+        return "bg-slate-500 hover:bg-slate-600";
     }
   };
 
   return (
-    <div className="w-full">
-      <div className="rounded-lg border bg-card p-6 shadow-lg">
-        <div className="flex flex-col gap-6">
+    <div className="w-full space-y-8">
+      <Card className="border-none bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold tracking-tight">Expense Claims</h2>
-            <Button>
+            <div>
+              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent dark:from-slate-100 dark:to-slate-300">
+                Expense Claims
+              </CardTitle>
+              <p className="text-slate-500 mt-1">Manage and track expense approvals</p>
+            </div>
+            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-200">
               <Plus className="mr-2 h-4 w-4" />
               New Expense
             </Button>
           </div>
+        </CardHeader>
 
+        <div className="p-6 space-y-6">
           <div className="flex items-center gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
               <Input
-                className="pl-10"
+                className="pl-10 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
                 placeholder="Search expenses..."
               />
             </div>
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" className="border-slate-200 dark:border-slate-700">
               <Filter className="h-4 w-4" />
             </Button>
           </div>
           
-          <div className="rounded-md border">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Submitted By</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Actions</TableHead>
+                <TableRow className="bg-slate-50 dark:bg-slate-800/50">
+                  <TableHead className="font-semibold">ID</TableHead>
+                  <TableHead className="font-semibold">Title</TableHead>
+                  <TableHead className="font-semibold">Amount</TableHead>
+                  <TableHead className="font-semibold">Category</TableHead>
+                  <TableHead className="font-semibold">Department</TableHead>
+                  <TableHead className="font-semibold">Status</TableHead>
+                  <TableHead className="font-semibold">Submitted By</TableHead>
+                  <TableHead className="font-semibold">Date</TableHead>
+                  <TableHead className="font-semibold">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {mockExpenses.map((expense) => (
-                  <TableRow key={expense.id} className="group">
+                  <TableRow key={expense.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50">
                     <TableCell className="font-medium">{expense.id}</TableCell>
-                    <TableCell>{expense.title}</TableCell>
-                    <TableCell>${expense.amount.toLocaleString()}</TableCell>
+                    <TableCell className="font-medium text-slate-900 dark:text-slate-100">{expense.title}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center text-slate-900 dark:text-slate-100">
+                        <DollarSign className="h-4 w-4 text-slate-500 mr-1" />
+                        {expense.amount.toLocaleString()}
+                      </div>
+                    </TableCell>
                     <TableCell>{expense.category}</TableCell>
                     <TableCell>{expense.department}</TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(expense.status)}>
+                      <Badge className={`${getStatusColor(expense.status)} shadow-sm`}>
                         {expense.status.replace("_", " ")}
                       </Badge>
                     </TableCell>
@@ -228,7 +240,7 @@ export function ExpenseList() {
                         variant="ghost"
                         size="sm"
                         onClick={() => setSelectedExpense(expense)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="opacity-0 group-hover:opacity-100 transition-all duration-200"
                       >
                         <Clock className="mr-2 h-4 w-4" />
                         View Workflow
@@ -240,14 +252,14 @@ export function ExpenseList() {
             </Table>
           </div>
         </div>
-      </div>
+      </Card>
 
       <Dialog open={!!selectedExpense} onOpenChange={() => setSelectedExpense(null)}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>Expense Workflow Details</DialogTitle>
+            <DialogTitle className="text-2xl font-bold">Expense Workflow Details</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             {selectedExpense && (
               <>
                 <ExpenseDetails {...selectedExpense} />
