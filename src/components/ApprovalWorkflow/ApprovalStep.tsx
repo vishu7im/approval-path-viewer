@@ -1,7 +1,8 @@
 
 import React from "react";
-import { Check, Clock, User, UserCheck } from "lucide-react";
+import { Check, Clock, MessageSquare, User, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 type ApprovalStatus = "pending" | "approved" | "skipped" | "current";
 
@@ -11,6 +12,8 @@ interface ApproverInfo {
   approved: boolean;
   isCurrentPointer: boolean;
   approvedBy?: string;
+  isCompleted?: boolean;
+  remark?: string;
 }
 
 interface ApprovalStepProps {
@@ -43,10 +46,10 @@ export function ApprovalStep({
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center">
+      <div className="flex items-start">
         <div
           className={cn(
-            "w-8 h-8 rounded-full flex items-center justify-center text-white shadow-sm",
+            "w-8 h-8 mt-1 rounded-full flex items-center justify-center text-white shadow-sm",
             getStatusColor()
           )}
         >
@@ -69,36 +72,62 @@ export function ApprovalStep({
                   <div
                     key={index}
                     className={cn(
-                      "flex items-center gap-2 p-3 rounded-lg transition-all duration-200",
+                      "flex flex-col gap-2 p-4 rounded-lg transition-all duration-200 border",
                       approver.isCurrentPointer 
-                        ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800" 
-                        : "hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                        ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800" 
+                        : approver.approved
+                          ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/40"
+                          : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700",
+                      "hover:shadow-md"
                     )}
                   >
-                    {approver.approved ? (
-                      <UserCheck className="h-4 w-4 text-emerald-500" />
-                    ) : (
-                      <User className="h-4 w-4 text-slate-500" />
-                    )}
-                    <span className="font-medium">{approver.name}</span>
-                    <span className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-full">
-                      {approver.role}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {approver.approved ? (
+                        <UserCheck className="h-4 w-4 text-emerald-500" />
+                      ) : (
+                        <User className="h-4 w-4 text-slate-500" />
+                      )}
+                      <span className="font-medium">{approver.name}</span>
+                      <span className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-full">
+                        {approver.role}
+                      </span>
+                      
+                      {approver.isCurrentPointer && (
+                        <span className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full ml-auto">
+                          Current Approver
+                        </span>
+                      )}
+                      
+                      {approver.isCompleted && !approver.isCurrentPointer && (
+                        <span className="text-xs bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded-full ml-auto">
+                          Completed
+                        </span>
+                      )}
+                    </div>
+                    
                     {approver.approved && approver.approvedBy && (
-                      <span className="text-xs text-emerald-600 dark:text-emerald-400 ml-auto">
+                      <div className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-1">
+                        <Check className="h-3 w-3" />
                         Approved by: {approver.approvedBy}
-                      </span>
+                      </div>
                     )}
-                    {approver.isCurrentPointer && (
-                      <span className="text-xs text-blue-600 dark:text-blue-400 ml-auto">
-                        Current Approver
-                      </span>
+                    
+                    {approver.remark && (
+                      <div className="mt-2 p-2 bg-slate-50 dark:bg-slate-800/50 rounded border border-slate-100 dark:border-slate-700 text-sm">
+                        <div className="flex items-center gap-1 text-slate-500 mb-1">
+                          <MessageSquare className="h-3 w-3" />
+                          <span className="text-xs font-medium">Remark:</span>
+                        </div>
+                        <p className="text-slate-700 dark:text-slate-300">{approver.remark}</p>
+                      </div>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <span className="text-sm text-slate-500">No approval needed</span>
+              <div className="flex items-center h-10 text-sm text-slate-500">
+                <span>No approval needed at this stage</span>
+              </div>
             )}
           </div>
         </div>

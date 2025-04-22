@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Table,
@@ -9,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowRight, Clock, DollarSign, Filter, MoreHorizontal, Plus, Search } from "lucide-react";
+import { ArrowRight, Clock, DollarSign, Filter, Plus, Search } from "lucide-react";
 import { ExpenseDetails } from "./ExpenseDetails";
 import { ApprovalPathViewer } from "./ApprovalWorkflow/ApprovalPathViewer";
 import { Badge } from "./ui/badge";
@@ -34,7 +35,7 @@ const mockExpenses: Expense[] = [
     title: "Business Trip to New York",
     amount: 15000,
     date: "2023-04-15",
-    status: "project_approval",
+    status: "EXPENSE_APPROVAL_REQUESTED",
     category: "Travel",
     submittedBy: "John Doe",
     description: "Annual client meeting and conference attendance",
@@ -45,7 +46,7 @@ const mockExpenses: Expense[] = [
     title: "Office Supplies",
     amount: 500,
     date: "2023-04-16",
-    status: "finance_approval",
+    status: "FINANCE_APPROVAL_REQUESTED",
     category: "Supplies",
     submittedBy: "Jane Smith",
     description: "Monthly office supplies restocking",
@@ -56,7 +57,7 @@ const mockExpenses: Expense[] = [
     title: "Team Lunch",
     amount: 200,
     date: "2023-04-17",
-    status: "cleared",
+    status: "CLEARED",
     category: "Meals",
     submittedBy: "Mike Johnson",
     description: "Team lunch for project completion",
@@ -67,7 +68,7 @@ const mockExpenses: Expense[] = [
     title: "Software Licenses",
     amount: 12000,
     date: "2023-04-18",
-    status: "project_approval",
+    status: "EXPENSE_APPROVAL_REQUESTED",
     category: "Technology",
     submittedBy: "Sarah Wilson",
     description: "Annual software subscription renewal",
@@ -78,7 +79,7 @@ const mockExpenses: Expense[] = [
     title: "Marketing Campaign",
     amount: 8500,
     date: "2023-04-19",
-    status: "finance_approval",
+    status: "FINANCE_APPROVAL_REQUESTED",
     category: "Marketing",
     submittedBy: "Alex Brown",
     description: "Q2 digital marketing campaign",
@@ -86,68 +87,88 @@ const mockExpenses: Expense[] = [
   }
 ];
 
-const approval_hierarchy = {
-  "draft": [],
-  "project_approval": [
+const mockApprovalHierarchy = {
+  "EXPENSE_REQUESTED": [
     {
-      role: "ceo",
-      user_name: "ramesh ceo",
-      next_status: "finance_approval",
-      previous_status: "draft",
-      current_status: "project_approval",
-      level: 1,
-      approved_by_uuid: null,
-      approved_by_name: "",
-      current_pointer: false
-    },
-    {
-      role: "project_manager",
-      user_name: "rohit",
-      next_status: "finance_approval",
-      previous_status: "draft",
-      current_status: "project_approval",
-      level: 2,
-      approved_by_uuid: null,
-      approved_by_name: "",
-      current_pointer: true
-    },
-    {
-      role: "category_manager",
-      user_name: "manish",
-      next_status: "finance_approval",
-      previous_status: "draft",
-      current_status: "project_approval",
-      level: 2,
-      approved_by_uuid: null,
-      approved_by_name: "",
-      current_pointer: false
+      "current_pointer": false,
+      "is_completed": true
     }
   ],
-  "finance_approval": [
+  "EXPENSE_APPROVAL_REQUESTED": [
     {
-      role: "finance_manager",
-      user_name: "rahul",
-      next_status: "cleared",
-      previous_status: "project_approval",
-      current_status: "finance_approval",
-      level: 1,
-      approved_by_uuid: null,
-      approved_by_name: "",
-      current_pointer: false
+      "role": "CEO",
+      "role_uuid": "123e4567-e89b-12d3-a456-426614174000",
+      "user_name": "CEO",
+      "user_uuid": "123e4567-e89b-12d3-a456-426614174000",
+      "next_status": "FINANCE_APPROVAL_REQUESTED",
+      "previous_status": "EXPENSE_REQUESTED",
+      "current_status": "EXPENSE_APPROVAL_REQUESTED",
+      "level": 1,
+      "approved_by_uuid": null,
+      "approved_by_name": null,
+      "current_pointer": false,
+      "is_completed": false
     },
     {
-      role: "finance_manager",
-      user_name: "rahul",
-      next_status: "cleared",
-      previous_status: "project_approval",
-      current_status: "finance_approval",
-      level: 2,
-      approved_by_uuid: null,
-      approved_by_name: "",
-      current_pointer: false
+      "role": "PROJECT_MANAGER",
+      "role_uuid": "dcb9eb69-efc8-4712-9a8d-8a6689bddffd",
+      "user_name": "project vishal",
+      "user_uuid": "daf68198-0c54-426a-98f5-7ed16fd00e85",
+      "next_status": "FINANCE_APPROVAL_REQUESTED",
+      "previous_status": "EXPENSE_REQUESTED",
+      "current_status": "EXPENSE_APPROVAL_REQUESTED",
+      "level": 2,
+      "approved_by_uuid": "daf68198-0c54-426a-98f5-7ed16fd00e85",
+      "approved_by_name": "project vishal",
+      "remark": "approved",
+      "current_pointer": false,
+      "is_completed": true
+    },
+    {
+      "role": "CATEGORY_MANAGER",
+      "role_uuid": "b957fc58-1367-4d57-a602-8dce179f4c5b",
+      "user_name": "Category Manager",
+      "user_uuid": "99a08cca-7f07-4740-87f7-96a216355112",
+      "next_status": "FINANCE_APPROVAL_REQUESTED",
+      "previous_status": "EXPENSE_REQUESTED",
+      "current_status": "EXPENSE_APPROVAL_REQUESTED",
+      "level": 3,
+      "approved_by_uuid": "522bc00e-6953-482c-8ca2-99c162bc6adc",
+      "approved_by_name": "Vishal Munday",
+      "remark": "Approved with conditions",
+      "current_pointer": false,
+      "is_completed": true
     }
   ],
-  "cleared": []
+  "FINANCE_APPROVAL_REQUESTED": [
+    {
+      "role": "FINANCE_MANAGER",
+      "role_uuid": "44bfd3e9-3732-4500-abde-19c6ef9b0d63",
+      "user_name": "NAITIK KASHYAP",
+      "user_uuid": "9725e1b2-08c1-45ad-b257-5bee03094876",
+      "next_status": "FINANCE",
+      "previous_status": "EXPENSE_REQUESTED",
+      "current_status": "FINANCE_APPROVAL_REQUESTED",
+      "level": 1,
+      "approved_by_uuid": "522bc00e-6953-482c-8ca2-99c162bc6adc",
+      "approved_by_name": "Vishal Munday",
+      "remark": "Budget validated and approved",
+      "current_pointer": false,
+      "is_completed": true
+    }
+  ],
+  "FINANCE": [
+    {
+      "current_pointer": false,
+      "is_completed": true
+    }
+  ],
+  "CLEARED": [
+    {
+      "current_pointer": true,
+      "is_completed": true
+    }
+  ]
 };
 
 export function ExpenseList() {
@@ -155,17 +176,26 @@ export function ExpenseList() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "draft":
+      case "EXPENSE_REQUESTED":
         return "bg-slate-500 hover:bg-slate-600";
-      case "project_approval":
+      case "EXPENSE_APPROVAL_REQUESTED":
         return "bg-amber-500 hover:bg-amber-600";
-      case "finance_approval":
+      case "FINANCE_APPROVAL_REQUESTED":
         return "bg-blue-500 hover:bg-blue-600";
-      case "cleared":
+      case "FINANCE":
+        return "bg-purple-500 hover:bg-purple-600";
+      case "CLEARED":
         return "bg-emerald-500 hover:bg-emerald-600";
       default:
         return "bg-slate-500 hover:bg-slate-600";
     }
+  };
+
+  const formatStatus = (status: string) => {
+    return status
+      .replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/\b\w/g, char => char.toUpperCase());
   };
 
   return (
@@ -200,7 +230,7 @@ export function ExpenseList() {
             </Button>
           </div>
           
-          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50 dark:bg-slate-800/50">
@@ -218,11 +248,11 @@ export function ExpenseList() {
               <TableBody>
                 {mockExpenses.map((expense) => (
                   <TableRow key={expense.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <TableCell className="font-medium">{expense.id}</TableCell>
+                    <TableCell className="font-mono text-xs">{expense.id}</TableCell>
                     <TableCell className="font-medium text-slate-900 dark:text-slate-100">{expense.title}</TableCell>
                     <TableCell>
                       <div className="flex items-center text-slate-900 dark:text-slate-100">
-                        <DollarSign className="h-4 w-4 text-slate-500 mr-1" />
+                        <DollarSign className="h-4 w-4 text-emerald-500 mr-1" />
                         {expense.amount.toLocaleString()}
                       </div>
                     </TableCell>
@@ -230,7 +260,7 @@ export function ExpenseList() {
                     <TableCell>{expense.department}</TableCell>
                     <TableCell>
                       <Badge className={`${getStatusColor(expense.status)} shadow-sm`}>
-                        {expense.status.replace("_", " ")}
+                        {formatStatus(expense.status)}
                       </Badge>
                     </TableCell>
                     <TableCell>{expense.submittedBy}</TableCell>
@@ -240,10 +270,11 @@ export function ExpenseList() {
                         variant="ghost"
                         size="sm"
                         onClick={() => setSelectedExpense(expense)}
-                        className="opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        className="opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center"
                       >
                         <Clock className="mr-2 h-4 w-4" />
                         View Workflow
+                        <ArrowRight className="ml-1 h-3 w-3" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -257,14 +288,16 @@ export function ExpenseList() {
       <Dialog open={!!selectedExpense} onOpenChange={() => setSelectedExpense(null)}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Expense Workflow Details</DialogTitle>
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent dark:from-slate-100 dark:to-slate-300">
+              Expense Workflow Details
+            </DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             {selectedExpense && (
               <>
                 <ExpenseDetails {...selectedExpense} />
                 <ApprovalPathViewer
-                  approvalHierarchy={approval_hierarchy}
+                  approvalHierarchy={mockApprovalHierarchy}
                   currentStatus={selectedExpense.status}
                   expenseAmount={selectedExpense.amount}
                 />
