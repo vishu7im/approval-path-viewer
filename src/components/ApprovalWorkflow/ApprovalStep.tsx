@@ -1,5 +1,6 @@
-import React from "react";
-import { Check, Clock, MessageSquare, User, UserCheck } from "lucide-react";
+
+import React, { useState } from "react";
+import { Check, Clock, MessageSquare, User, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -28,6 +29,15 @@ export function ApprovalStep({
   status,
   isLastStep = false,
 }: ApprovalStepProps) {
+  const [expandedRemarks, setExpandedRemarks] = useState<Record<number, boolean>>({});
+
+  const toggleRemark = (index: number) => {
+    setExpandedRemarks(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
+
   const getStatusColor = () => {
     switch (status) {
       case "approved":
@@ -90,9 +100,35 @@ export function ApprovalStep({
                       </div>
                     )}
                     {approver.remark && (
-                      <div className="mt-2 flex items-start gap-1.5 text-xs text-slate-600 dark:text-slate-400">
-                        <MessageSquare className="h-3 w-3 mt-0.5" />
-                        <span>{approver.remark}</span>
+                      <div className="mt-2">
+                        <div className="flex items-start gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                          <MessageSquare className="h-3 w-3 mt-0.5" />
+                          {approver.remark.length > 100 && !expandedRemarks[index] ? (
+                            <div className="flex-1">
+                              <span>{approver.remark.substring(0, 100)}...</span>
+                              <button 
+                                onClick={() => toggleRemark(index)}
+                                className="ml-1 text-blue-500 hover:text-blue-700 inline-flex items-center"
+                              >
+                                <span className="mr-1">Show more</span>
+                                <ChevronDown className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ) : approver.remark.length > 100 ? (
+                            <div className="flex-1">
+                              <span>{approver.remark}</span>
+                              <button 
+                                onClick={() => toggleRemark(index)}
+                                className="ml-1 text-blue-500 hover:text-blue-700 inline-flex items-center"
+                              >
+                                <span className="mr-1">Show less</span>
+                                <ChevronUp className="h-3 w-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <span>{approver.remark}</span>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

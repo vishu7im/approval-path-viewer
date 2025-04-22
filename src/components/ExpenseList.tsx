@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -10,9 +9,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowRight, Clock, DollarSign, Filter, Plus, Search } from "lucide-react";
 import { ExpenseDetails } from "./ExpenseDetails";
 import { ApprovalPathViewer } from "./ApprovalWorkflow/ApprovalPathViewer";
+import { CommentSection } from "./ApprovalWorkflow/CommentSection";
 import { Badge } from "./ui/badge";
 import { Input } from "./ui/input";
 import { Card, CardHeader, CardTitle } from "./ui/card";
@@ -172,7 +173,8 @@ const mockApprovalHierarchy = {
 };
 
 export function ExpenseList() {
-  const [selectedExpense, setSelectedExpense] = React.useState<Expense | null>(null);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [activeTab, setActiveTab] = useState("workflow");
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -289,21 +291,36 @@ export function ExpenseList() {
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent dark:from-slate-100 dark:to-slate-300">
-              Expense Workflow Details
+              Expense Details
             </DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-            {selectedExpense && (
-              <>
-                <ExpenseDetails {...selectedExpense} />
-                <ApprovalPathViewer
-                  approvalHierarchy={mockApprovalHierarchy}
-                  currentStatus={selectedExpense.status}
-                  expenseAmount={selectedExpense.amount}
-                />
-              </>
-            )}
-          </div>
+          
+          {selectedExpense && (
+            <div className="mt-4">
+              <ExpenseDetails {...selectedExpense} />
+              
+              <div className="mt-6">
+                <Tabs defaultValue="workflow" value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="grid grid-cols-2 mb-4">
+                    <TabsTrigger value="workflow">Approval Workflow</TabsTrigger>
+                    <TabsTrigger value="comments">Comments</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="workflow" className="mt-0">
+                    <ApprovalPathViewer
+                      approvalHierarchy={mockApprovalHierarchy}
+                      currentStatus={selectedExpense.status}
+                      expenseAmount={selectedExpense.amount}
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="comments" className="mt-0">
+                    <CommentSection expenseId={selectedExpense.id} />
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
