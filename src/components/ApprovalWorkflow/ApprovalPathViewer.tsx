@@ -1,7 +1,7 @@
-
 import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ApprovalStep } from "./ApprovalStep";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export interface ApprovalLevel {
   role?: string;
@@ -33,13 +33,11 @@ export function ApprovalPathViewer({
   approvalHierarchy,
   currentStatus,
 }: ApprovalPathViewerProps) {
-  // Determine status of each step
   const getStepStatus = (status: string, approvers: ApprovalLevel[]) => {
     const statusKeys = Object.keys(approvalHierarchy);
     const currentIndex = statusKeys.indexOf(currentStatus);
     const statusIndex = statusKeys.indexOf(status);
 
-    // Check if any approver in this status has current_pointer
     const hasCurrentPointer = approvers.some(a => a.current_pointer);
     const isCompleted = approvers.every(a => a.is_completed);
     
@@ -48,7 +46,6 @@ export function ApprovalPathViewer({
     return "pending";
   };
 
-  // Format status display name
   const formatStatusName = (status: string) => {
     return status
       .replace(/_/g, ' ')
@@ -60,10 +57,8 @@ export function ApprovalPathViewer({
     const steps = [];
     
     Object.entries(approvalHierarchy).forEach(([status, approvers]) => {
-      // Skip steps with empty approvers or if only contains status indicators
       if (approvers.length === 0 || 
           (approvers.length === 1 && !approvers[0].role && !approvers[0].user_name)) {
-        // Only add draft and cleared states
         if (status === "EXPENSE_REQUESTED" || status === "CLEARED" || status === "FINANCE") {
           steps.push({
             title: formatStatusName(status),
@@ -72,7 +67,6 @@ export function ApprovalPathViewer({
           });
         }
       } else {
-        // Group approvers by level
         const levelGroups = approvers.reduce((acc, approver) => {
           const level = approver.level || 0;
           if (!acc[level]) acc[level] = [];
@@ -104,25 +98,27 @@ export function ApprovalPathViewer({
   }, [approvalHierarchy, currentStatus]);
 
   return (
-    <Card className="w-full shadow-lg bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 border border-slate-200/50 dark:border-slate-700/50">
-      <CardHeader className="pb-2 border-b border-slate-100 dark:border-slate-700">
-        <CardTitle className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent dark:from-slate-100 dark:to-slate-300">
-          Approval Workflow Timeline
+    <Card className="w-full shadow-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+      <CardHeader className="pb-2 border-b border-slate-100 dark:border-slate-800">
+        <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          Approval Workflow
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-6">
-        <div className="space-y-4">
-          {approvalSteps.map((step, index) => (
-            <ApprovalStep
-              key={index}
-              title={step.title}
-              approvers={step.approvers}
-              status={step.status}
-              isLastStep={index === approvalSteps.length - 1}
-            />
-          ))}
-        </div>
-      </CardContent>
+      <ScrollArea className="h-[480px]">
+        <CardContent className="p-4">
+          <div className="space-y-4">
+            {approvalSteps.map((step, index) => (
+              <ApprovalStep
+                key={index}
+                title={step.title}
+                approvers={step.approvers}
+                status={step.status}
+                isLastStep={index === approvalSteps.length - 1}
+              />
+            ))}
+          </div>
+        </CardContent>
+      </ScrollArea>
     </Card>
   );
 }
